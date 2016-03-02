@@ -1,0 +1,14 @@
+
+# specific directories / files
+/packer/build
+/packer/packer_cache
+/packer/templates
+/packer/resources/venv
+
+# types of files
+_rel
+*.swp
+.DS_Store
+
+
+

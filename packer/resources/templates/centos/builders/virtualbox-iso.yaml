@@ -1,0 +1,35 @@
+
+#  variables used by this file:
+#  - vm_name -- vm name (? are these the same ?)
+#  - kickstart -- kickstart cfg filename
+#  - disk_size
+#  - memory
+#  - cpus
+#  - 
+
+type: virtualbox-iso
+# iso info 
+iso_url: 'http://mirrors.rit.edu/centos/6.7/isos/x86_64/CentOS-6.7-x86_64-bin-DVD1.iso'
+iso_checksum: 7bb8c1c23a4fdef93e6f0a6347d570e5764d0b38
+iso_checksum_type: sha1
+# ssh info
+ssh_username: '{{ user `ssh_username` }}'
+ssh_password: '{{ user `ssh_password` }}'
+ssh_wait_timeout: 10000s
+# vbox static config 
+vm_name: '{{ user `vm_name` }}'
+disk_size: '{{ user `disk_size` }}'
+vboxmanage:
+  - ['modifyvm', '{{.Name}}', '--memory', '{{ user `memory` }}']
+  - ['modifyvm', '{{.Name}}', '--cpus', '{{ user `cpus` }}']
+guest_os_type: RedHat_64
+hard_drive_interface: sata
+headless: false
+# boot / shutdown
+boot_command: 
+  - '<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{ user `kickstart` }}'
+  - '<enter>'
+shutdown_command: 'echo packer | sudo -S shutdown -P now'
+# misc
+http_directory: resources/static/http
+

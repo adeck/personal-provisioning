@@ -1,12 +1,13 @@
 
 # specific directories / files
-/packer/build
-/packer/packer_cache
-/packer/templates
-/packer/resources/venv
+/packer/build/
+/packer/packer_cache/
+/packer/templates/
+/packer/resources/venv/
+/vagrant/.vagrant/
 
 # types of files
-_rel
+_rel/
 *.swp
 .DS_Store
 

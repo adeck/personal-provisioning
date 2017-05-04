@@ -1,0 +1,3 @@
+[submodule "terraform-infra"]
+	path = terraform-infra
+	url = git@github.com:adeck/terraform-infra

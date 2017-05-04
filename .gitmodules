@@ -1,3 +1,6 @@
 [submodule "terraform-infra"]
 	path = terraform-infra
 	url = git@github.com:adeck/terraform-infra
+[submodule "salt-configs"]
+	path = salt-configs
+	url = git@github.com:adeck/salt-configs

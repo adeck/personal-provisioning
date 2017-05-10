@@ -1,0 +1,46 @@
+---
+
+- hosts: salt-infra
+  become: yes
+  tasks:
+    - apt:
+        name: salt-master
+        state: present
+        update_cache: yes
+    - service:
+        name: salt-master
+        state: running
+
+- hosts: all
+  become: yes
+  tasks:
+    - apt:
+        update_cache: yes
+    - apt:
+        name: salt-minion
+        state: present
+    - copy:
+        dest: /etc/salt/minion.d/99-master_name.conf
+        content: "master: salt-infra\n"
+    - service:
+        name: salt-minion
+        state: restarted
+
+- hosts: salt-infra
+  become: yes
+  tasks:
+# TODO -- copy over saltmaster config
+# TODO -- copy over states, formulas, and pillar
+    - file:
+        path: /srv/salt
+        state: directory
+    - synchronize:
+        src: "../salt-configs/{{ item }}"
+        dest: "/srv/salt"
+      with_items:
+        - states
+        - pillar
+    - command: salt-key --accept-all -y
+
+
+

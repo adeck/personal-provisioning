@@ -1,0 +1,10 @@
+
+Host gw
+    User admin
+    Hostname {{ gw_hostname }}
+    ProxyCommand none
+
+Host *
+    User admin
+    ProxyCommand ssh -A gw -W %h:%p
+

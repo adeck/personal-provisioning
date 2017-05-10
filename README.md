@@ -4,8 +4,8 @@ A repo for provisioning my cloud infrastructure.
 
 Short version:
 - terraform sets up everything but what's actually on the boxen (VPC, SGs, subnets, EIPs, forwarding tables, etc.)
-- ansible sets up salt infrastructure ( :P )
-- salt configures the boxen
+- ansible sets up salt infrastructure (I'm kind of... over ansible for the foreseeable future outside the context of bootstrapping salt. :P )
+- salt configures the boxen (files, installed packages, running services, etc.)
 
 Haven't done much with packer yet.
 Don't really see a huge need at this point.

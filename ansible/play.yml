@@ -3,6 +3,22 @@
 - hosts: salt-infra
   become: yes
   tasks:
+    - copy:
+        dest: /etc/salt/master
+        content: |
+          file_roots:
+            base:
+              - /srv/salt/states
+# TODO -- copy over states, formulas, and pillar
+    - file:
+        path: /srv/salt
+        state: directory
+    - synchronize:
+        src: "../salt-configs/{{ item }}"
+        dest: "/srv/salt"
+      with_items:
+        - states
+        - pillar
     - apt:
         name: salt-master
         state: present
@@ -29,17 +45,7 @@
 - hosts: salt-infra
   become: yes
   tasks:
-# TODO -- copy over saltmaster config
-# TODO -- copy over states, formulas, and pillar
-    - file:
-        path: /srv/salt
-        state: directory
-    - synchronize:
-        src: "../salt-configs/{{ item }}"
-        dest: "/srv/salt"
-      with_items:
-        - states
-        - pillar
+    - pause: seconds=10
     - command: salt-key --accept-all -y
 
 

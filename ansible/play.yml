@@ -1,32 +1,4 @@
 ---
-
-- hosts: salt-infra
-  become: yes
-  tasks:
-    - copy:
-        dest: /etc/salt/master
-        content: |
-          file_roots:
-            base:
-              - /srv/salt/states
-# TODO -- copy over states, formulas, and pillar
-    - file:
-        path: /srv/salt
-        state: directory
-    - synchronize:
-        src: "../salt-configs/{{ item }}"
-        dest: "/srv/salt"
-      with_items:
-        - states
-        - pillar
-    - apt:
-        name: salt-master
-        state: present
-        update_cache: yes
-    - service:
-        name: salt-master
-        state: running
-
 - hosts: all
   become: yes
   tasks:
@@ -41,6 +13,35 @@
     - service:
         name: salt-minion
         state: restarted
+
+- hosts: salt-infra
+  become: yes
+  tasks:
+#    - copy:
+#        dest: /etc/salt/master
+#        content: |
+#          file_roots:
+#            base:
+#              - /srv/salt/states
+# TODO -- copy over states, formulas, and pillar
+    - file:
+        path: /srv/salt
+        state: directory
+    - apt:
+        name: rsync
+        state: present
+    - synchronize:
+        src: "../salt-configs/{{ item }}"
+        dest: "/srv/salt"
+      with_items:
+        - states
+        - pillar
+    - apt:
+        name: salt-master
+        state: present
+    - service:
+        name: salt-master
+        state: running
 
 - hosts: salt-infra
   become: yes

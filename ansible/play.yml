@@ -23,7 +23,12 @@
           file_roots:
             base:
               - /srv/salt/states
-              - /srv/salt/formulas/*
+              # the version of salt in the repos doesn't support wildcards
+              #- /srv/salt/formulas/*
+              - /srv/salt/formulas/nagios-formula
+          pillar_roots:
+            base:
+              - /srv/salt/pillar
 # TODO -- copy over states, formulas, and pillar
     - file:
         path: /srv/salt

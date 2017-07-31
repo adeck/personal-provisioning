@@ -17,12 +17,13 @@
 - hosts: salt-infra
   become: yes
   tasks:
-#    - copy:
-#        dest: /etc/salt/master
-#        content: |
-#          file_roots:
-#            base:
-#              - /srv/salt/states
+    - copy:
+        dest: /etc/salt/master
+        content: |
+          file_roots:
+            base:
+              - /srv/salt/states
+              - /srv/salt/formulas/*
 # TODO -- copy over states, formulas, and pillar
     - file:
         path: /srv/salt
@@ -35,6 +36,7 @@
         dest: "/srv/salt"
       with_items:
         - states
+        - formulas
         - pillar
     - apt:
         name: salt-master

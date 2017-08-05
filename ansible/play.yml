@@ -23,9 +23,7 @@
           file_roots:
             base:
               - /srv/salt/states
-              # the version of salt in the repos doesn't support wildcards
-              #- /srv/salt/formulas/*
-              - /srv/salt/formulas/nagios-formula
+              - /srv/salt/formulas/*
           pillar_roots:
             base:
               - /srv/salt/pillar
@@ -55,6 +53,12 @@
   tasks:
     - pause: seconds=10
     - command: salt-key --accept-all -y
+    - command: salt '*' saltutil.sync_modules
+    - command: salt '*' saltutil.refresh_pillar
+    - service:
+        name: salt-master
+        state: restarted
+
 
 
 

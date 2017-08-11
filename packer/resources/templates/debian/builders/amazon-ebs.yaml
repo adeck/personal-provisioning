@@ -1,0 +1,33 @@
+
+#  variables used by this file:
+#  - region -- AWS region to store the AMI
+
+type: amazon-ebs
+
+## aws connection info
+
+# these are retrieved from environment variables
+#secret_key: '{{ user `secret_key` }}'
+#access_key: '{{ user `access_key` }}'
+region: '{{ user `region` }}'
+ami_description: 'base Debian Stretch AMI for all EC2 instances deployed'
+# regions to copy the resulting AMI to
+#ami_regions: ['us-east-1', 'us-west-2']
+
+# the unique AMI name
+ami_name: debian-stretch-base
+# if an AMI exists with the same name, this says to delete that AMI and replace it with this new one
+force_deregister: true
+source_ami_filter:
+  most_recent: true
+  filters:
+    name: "debian-stretch-*"
+    virtualization-type: hvm
+  owners: ["379101102735"] # Debian
+
+# the EC2 instance type to launch the source AMI as
+instance_type: t2.micro
+ssh_username: admin
+
+
+

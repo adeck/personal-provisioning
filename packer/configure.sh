@@ -8,9 +8,4 @@ mkdir() {
 }
 mkdir templates
 cd resources
-mkdir venv
-virtualenv venv
-. venv/bin/activate
-pip install --upgrade pip || true
-pip install pyyaml
 

@@ -9,7 +9,7 @@
 #         golang, and I'm not enamored with that language.
 
 templates = [
-  'centos'
+  'debian'
 ]
 
 import yaml

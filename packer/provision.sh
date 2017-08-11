@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -x -e
+set -x
 
-. resources/venv/bin/activate
 mkdir templates 2>/dev/null
-./resources/lib/build.py > templates/centos.json
-packer build templates/centos.json
+mkdir resources/templates 2>/dev/null
+./resources/lib/build.py > templates/debian.json
+packer build templates/debian.json
 
 

@@ -6,6 +6,9 @@
 /packer/resources/venv/
 /vagrant/.vagrant/
 
+/ansible/ssh_config
+/ansible/inventory.ini
+
 # types of files
 _rel/
 *.swp

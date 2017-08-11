@@ -2,11 +2,6 @@
 - hosts: all
   become: yes
   tasks:
-    - apt:
-        update_cache: yes
-    - apt:
-        name: salt-minion
-        state: present
     - copy:
         dest: /etc/salt/minion.d/99-master_name.conf
         content: "master: salt-infra\n"
@@ -31,9 +26,6 @@
     - file:
         path: /srv/salt
         state: directory
-    - apt:
-        name: rsync
-        state: present
     - synchronize:
         src: "../salt-configs/{{ item }}"
         dest: "/srv/salt"

@@ -5,8 +5,9 @@ builders:
 provisioners:
   - type: shell
     inline:
-      - 'sudo apt-get update'
-      - 'sudo apt-get dist-upgrade -y'
+      - sudo apt-get update
+      - sudo apt-get -y dist-upgrade
+      - sudo apt-get -y install rsync salt-minion
 
 variables:
   region: 'us-west-1'

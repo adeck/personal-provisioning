@@ -8,6 +8,8 @@ provisioners:
       - sudo apt-get update
       - sudo apt-get -y dist-upgrade
       - sudo apt-get -y install rsync salt-minion
+      - sudo service salt-minion stop
+      - sudo rm /etc/salt/minion_id
 
 variables:
   region: 'us-west-1'

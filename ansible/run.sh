@@ -20,9 +20,11 @@ for fname in ['inventory.ini', 'ssh_config']:
 "
 
 cp ~/.ssh/config ~/.ssh/config.bak$$ && cp ssh_config ~/.ssh/config
-ssh -oStrictHostKeyChecking=no gw exit
-ssh -oStrictHostKeyChecking=no salt-infra exit
-ssh -oStrictHostKeyChecking=no monitoring-infra exit
-ansible-playbook -i inventory.ini play.yml
+{
+  ssh -oStrictHostKeyChecking=no gw exit
+  ssh -oStrictHostKeyChecking=no salt-infra exit
+  ssh -oStrictHostKeyChecking=no monitoring-infra exit
+  ansible-playbook -i inventory.ini play.yml
+}
 cp ~/.ssh/config.bak$$ ~/.ssh/config
 

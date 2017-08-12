@@ -82,5 +82,6 @@ At the moment it doesn't have any data sources configured.
 - setup IAM policies and roles, and grafana internals, s.t. there's grafana dashboarding for the CloudWatch basic monitoring of all these hosts
 - setup meaningful internal host monitoring- icinga and / or collectd- s.t. I can determine appropriate sizing for these machines. Currently they're at `t2.micro` with whatever the default EBS storage is, but even that's probably overkill. At least for testing the config.
 - improving this documentation, and putting better explanations of variables into the terraform.tfvars file
+- verifying that the IAM assume_role policy isn't too permissive; I don't fully understand what it's doing, and that deeply concerns me.
 
 

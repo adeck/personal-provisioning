@@ -14,6 +14,7 @@
   tasks:
     - copy:
         dest: /etc/salt/master
+        mode: 0444
         content: |
           file_roots:
             base:
@@ -29,6 +30,11 @@
     - synchronize:
         src: "../salt-configs/{{ item }}"
         dest: "/srv/salt"
+        archive: no
+        links: yes
+        recursive: yes
+        delete: yes
+        perms: no
       with_items:
         - states
         - formulas
@@ -45,7 +51,7 @@
   tasks:
     - pause: seconds=10
     - command: salt-key --accept-all -y
-    - command: salt '*' saltutil.sync_modules
+    - command: salt '*' saltutil.sync_all
     - command: salt '*' saltutil.refresh_pillar
     - service:
         name: salt-master

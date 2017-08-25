@@ -2,8 +2,8 @@
 
 set -x
 
-pushd ../terraform-infra/real
-  IP="$(./path.py infra)"
+pushd ../terraform-infra/infra
+  IP="$(./gw_ip.sh)"
 popd
 
 echo "$IP" | python -c "
@@ -26,5 +26,5 @@ cp ~/.ssh/config ~/.ssh/config.bak$$ && cp ssh_config ~/.ssh/config
   ssh -oStrictHostKeyChecking=no monitoring-infra exit
   ansible-playbook -i inventory.ini play.yml
 }
-cp ~/.ssh/config.bak$$ ~/.ssh/config
+cp ~/.ssh/config.bak$$ ~/.ssh/config && rm ~/.ssh/config.bak$$
 

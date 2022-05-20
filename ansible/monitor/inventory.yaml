@@ -1,0 +1,10 @@
+---
+
+all:
+    hosts:
+        gw:
+        devbox:
+        monitor:
+    vars:
+        ansible_ssh_user: admin
+

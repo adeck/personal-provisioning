@@ -1,0 +1,170 @@
+
+# setting up an ELK server as per:
+# https://linuxize.com/post/how-to-install-elasticsearch-on-debian-9/
+- hosts: monitor
+  become: yes
+  gather_facts: no
+  tasks:
+    #### Setting up repos and keys
+    - name: Ensure openjdk is installed and HTTPS works with apt.
+      apt:
+        name: [apt-transport-https, openjdk-17-jdk]
+    - name: Install GPG so `apt_key` works.
+      apt:
+        name: gpg
+    # TODO: `apt_key` module is deprecated. Debian has decided to "simplify" things by deprecating the `apt-key` command without providing a convenient command that fills the same niche.
+    - name: Install the elastic.co repo key.
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    - name: Install the elastic.co repo.
+      apt_repository:
+        repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+    #### Install elasticsearch
+    # TODO: configure network.host
+    - name: Install elasticsearch.
+      apt:
+        name: elasticsearch
+    - name: Enable and start elasticsearch.
+      systemd:
+        name: elasticsearch
+        state: started
+        enabled: yes
+    # useful for verification, unnecessary here
+    #- command: curl -X GET localhost:9200/
+    #### Install kibana
+    # TODO: configure server.host
+    - name: Install kibana.
+      apt:
+        name: kibana
+    - name: Enable and start kibana.
+      systemd:
+        name: kibana
+        state: started
+        enabled: yes
+    #### Install metricbeat
+    - name: Install metricbeat.
+      apt:
+        name: metricbeat
+    - command: metricbeat modules enable system
+    - command: metricbeat modules enable elasticsearch-xpack
+    - name: Wait for kibana to get started.
+      pause:
+        seconds: 30
+    # TODO: Real talk? It's actually really bad if this is run twice.
+    - command: metricbeat setup -e
+    - name: Enable and start metricbeat
+      systemd:
+        name: metricbeat
+        state: started
+        enabled: yes
+    #### Install nginx to reverse-proxy kibana
+    # TODO: configure server.host
+#    - name: Installing nginx, htpasswd, and passlib.
+#      apt:
+#        name: [nginx, apache2-utils, python-passlib]
+#    - name: Creating kibana accounts via nginx.
+#      htpasswd:
+#        name: "{{ item.name }}"
+#        password: "{{ item.password }}"
+#        path: /etc/nginx/htpasswd.users
+#      with_items: "{{ common.monitor.kibana.users }}"
+#    - name: Put the nginx config in place.
+#      copy:
+#        dest: /etc/nginx/sites-available/default
+#        content: |
+#            server {
+#                listen 80;
+#
+#                server_name {{ common.monitor.hostname }};
+#
+#                auth_basic "Restricted Access";
+#                auth_basic_user_file /etc/nginx/htpasswd.users;
+#
+#                location / {
+#                    proxy_pass http://localhost:5601;
+#                    proxy_http_version 1.1;
+#                    proxy_set_header Upgrade $http_upgrade;
+#                    proxy_set_header Connection 'upgrade';
+#                    proxy_set_header Host $host;
+#                    proxy_cache_bypass $http_upgrade;        
+#                }
+#            }
+#    - name: Enable and install nginx.
+#      systemd:
+#        name: nginx
+#        state: restarted
+#        enabled: yes
+    #### Setup PKI
+    - name: Create cert directories for TLS.
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /etc/pki/tls/certs
+        - /etc/pki/tls/private
+    - name: Create TLS cert.
+      command:
+        cmd: >
+            openssl req -x509 -batch -nodes
+                -subj '/CN={{ common.monitor.hostname }}'
+                -days 365 -newkey rsa:4096 -sha512
+                -keyout {{ item.key }} -out {{ item.cert }}
+        creates: "{{ item.cert }}"
+      with_items:
+        - key: /etc/pki/tls/private/logstash-forwarder.key
+          cert: /etc/pki/tls/certs/logstash-forwarder.crt
+    #### Install logstash
+#    - name: Install logstash.
+#      apt:
+#        name: logstash
+#    - name: Put the logstash config in place.
+#      copy:
+#        src: templates/logstash/conf.d/{{ item }}
+#        dest: /etc/logstash/conf.d/{{ item }}
+#      with_items:
+#        - 02-beats-input.conf
+#        - 03-syslog-filter.conf
+#        - 04-elasticsearch-output.conf
+#    - name: Verify that the logstash config passes validation.
+#      command: /usr/share/logstash/bin/logstash --config.test_and_exit -f /etc/logstash/conf.d/
+#    - name: Enable and start logstash.
+#      systemd:
+#        name: logstash
+#        state: restarted
+#        enabled: yes
+    #### Download kibana dashboards
+    # TODO: Do I actually need to download special dashboards?
+    # I should probably just be following this guide instead:
+    # https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-elastic-stack.html
+#    - name: Install unzip.
+#      apt:
+#        name: unzip
+#    - name: Creating beats-dashboards directory.
+#      file:
+#        path: /root/beats-dashboards
+#        state: directory
+#    - name: Unzipping the beats kibana dashboard archive.
+#      unarchive:
+#        dest: /root/beats-dashboards
+#        src: https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip
+#        remote_src: yes
+#      register: new_dashboards
+#    - command: /root/beats-dashboards/beats-dashboards-1.1.0/load.sh
+#      when: new_dashboards.changed
+#    - name: Upload filebeat template.
+#      uri:
+#        url: http://localhost:9200/_template/filebeat?pretty
+#        src: templates/filebeat-index-template.json
+#        body_format: json
+#        method: PUT
+    #- command: /root/beats-dashboards/load.sh
+    # TODO: follow instructions from here on out
+    #           https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-logstash-and-kibana-elk-stack-on-ubuntu-14-04#option-2-fqdn-dns#load-kibana-dashboards
+    
+
+        
+
+
+
+
+

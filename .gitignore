@@ -7,6 +7,7 @@
 /vagrant/.vagrant/
 
 # types of files
+nogit/
 _rel/
 *.swp
 .DS_Store

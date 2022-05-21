@@ -1,20 +1,14 @@
 
 #
-# There's some stuff here from when I used a ForwardAgent configuration instead of a JumpHost configuration.
-#   That was a crazy time.
-#
 # Replace $my_domain with the domain name you own.
 #
 
 Host gw
     Hostname gw.$my_domain
     User admin
-#    ForwardAgent yes
-#    ProxyCommand none
 
 Host devbox monitor
     ProxyJump gw
     User admin
     HostName %h.devel.local
-#    ProxyCommand ssh -A admin@gw -W %h:%p
 

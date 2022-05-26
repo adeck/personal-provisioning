@@ -2,6 +2,7 @@
 # setting up an ELK server as per:
 # https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-elastic-stack.html
 - hosts: monitor
+  collections: [ansible.builtin]
   become: yes
   gather_facts: no
   tasks:
@@ -29,3 +30,15 @@
         name: elasticsearch
         state: started
         enabled: yes
+      # TODO -- set password for `elastic` user
+    - name: Set password for "elastic" user
+      # See: https://github.com/elastic/elasticsearch/blob/1088ef6ded05ba91ac9c7ead62f851a58d8c5dfc/x-pack/plugin/security/src/main/java/org/elasticsearch/xpack/security/authc/esnative/tool/ResetPasswordTool.java#L68-L79
+      # -b / --batch -- indicates this is being run from the commandline, not interactively
+      # -i // --interactive -- indicates we are manually setting the password, not having the tool autogenerate + set a password
+      command: ./bin/elasticsearch-reset-password -u elastic -b -i
+      args:
+         chdir: /usr/share/elasticsearch
+         stdin: "{{ lookup('password', 'nogit/keys/elasticsearch/users/elastic' length=30') }}"
+      # TODO -- validate Elasticsearch is up and running with curl --cacert $ES_PATH_CONF/certs/http_ca.crt -u elastic https://localhost:9200, and then enter the password from above when prompted
+      # TODO -- generate Elasticsearch enrollment token that Kibana can use by using the elasticsearch-create-enrollment-token command .
+

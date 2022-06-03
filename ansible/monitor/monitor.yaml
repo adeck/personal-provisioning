@@ -38,7 +38,6 @@
         name: elasticsearch
         state: started
         enabled: yes
-      # TODO -- set password for `elastic` user
       # See: https://github.com/elastic/elasticsearch/blob/1088ef6ded05ba91ac9c7ead62f851a58d8c5dfc/x-pack/plugin/security/src/main/java/org/elasticsearch/xpack/security/authc/esnative/tool/ResetPasswordTool.java#L68-L79
       # -b / --batch -- indicates this is being run from the commandline, not interactively
       # -i // --interactive -- indicates we are manually setting the password, not having the tool autogenerate + set a password
@@ -46,7 +45,36 @@
       command: ./bin/elasticsearch-reset-password -u elastic -b -i
       args:
          chdir: /usr/share/elasticsearch
-         stdin: "{{ monitor.elasticsearch.users.elastic }}"
-      # TODO -- validate Elasticsearch is up and running with curl --cacert $ES_PATH_CONF/certs/http_ca.crt -u elastic https://localhost:9200, and then enter the password from above when prompted
+         stdin: "{{ password }}\n{{ password }}"
+      vars:
+         password: "{{ monitor.elasticsearch.users.elastic }}"
+      register: result
+      failed_when: not (result.rc == 0 and result.stdout == "Password for the [elastic] user successfully reset.")
+    # -s -- silent, don't show a progress bar or anything
+    # -o -- pipe the server's response to the given file. /dev/null indicates to scrap the output.
+    # -w %{http_code} -- says what should be written to stdout in a special format, in this case the HTTP status code.
+    #   HTTP response code:
+    #       200 -- correct password
+    #       401 -- wrong password
+    - name: Validate password is correct
+      command: "curl -s -o /dev/null -w %{http_code} --cacert {{ca_cert}} -u elastic https://localhost:9200"
+      args:
+         stdin: "{{ monitor.elasticsearch.users.elastic }}\n"
+      vars:
+         ca_cert: /etc/elasticsearch/certs/http_ca.crt
+      timeout: 5
+      register: result
+      failed_when: result.stdout != "Enter host password for user 'elastic':\n200"
+      # this doesn't ever actually change anything
+      changed_when: "false"
+    # TODO -- remove
+    - debug:
+         var: cur_env
+      failed_when: "true"
       # TODO -- generate Elasticsearch enrollment token that Kibana can use by using the elasticsearch-create-enrollment-token command .
+    - name: Generate kibana enrollment token
+      command: ./bin/elasticsearch-create-enrollment-token --scope kibana
+      args:
+         chdir: /usr/share/elasticsearch
+      register: kibana_enrollment_token
 

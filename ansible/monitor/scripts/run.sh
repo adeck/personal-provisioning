@@ -3,5 +3,5 @@
 ansible-playbook -v \
     -i inventory.yaml \
     --vault-id $CUR_ENV@prompt \
-    $1
+    "$@"
 

@@ -7,6 +7,7 @@
   gather_facts: no
   vars:
     cur_env: "{{ lookup('env', 'CUR_ENV') | default('devel', True) }}"
+    metricbeat_ca_path: /etc/metricbeat/elasticsearch_http_ca.crt
   tasks:
     - debug:
         var: cur_env
@@ -92,11 +93,36 @@
         - name: Install metricbeat.
           apt:
             name: metricbeat
-        # NOTE -- as of 2022-6-5, this module is enabled by default
-        - name: Enable system metrics module
-          command: metricbeat modules enable system
+        - name: Copy the Elasticsearch HTTP CA certs
+          copy:
+            remote_src: yes
+            src: /etc/elasticsearch/certs/http_ca.crt
+            dest: '{{ metricbeat_ca_path }}'
+            mode: 0444
+            owner: root
+            group: root
+        - name: Template the metricbeat config file
+          vars:
+            config_path: /etc/metricbeat/metricbeat.yml
+          template:
+            src: "templates/{{ config_path }}"
+            dest: "{{ config_path }}"
+            owner: root
+            group: root
+            mode: 0600
+        # NOTE -- as of 2022-6-5, system module is enabled by default
+        - name: Enable metricbeat modules
+          command: "metricbeat modules enable {{ item }}"
           register: result
-          changed_when: result.stdout == "Enabled system"
-        # loads the kibana dashboards
-        #- command: metricbeat setup
+          changed_when: "result.stdout == ('Enabled ' + item)"
+          loop: [system]
+        - name: Loads the kibana dashboards
+          command: metricbeat setup
+          retries: 4
+          delay: 10
+        - name: Enable and start metricbeat
+          systemd:
+            name: metricbeat
+            state: started
+            enabled: yes
 

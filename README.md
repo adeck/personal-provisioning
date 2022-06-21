@@ -18,6 +18,6 @@ In 2022 I resurrected this repo, updating terraform layouts to support the most 
 First, provision the hardware by following the instructions in the [terraform-infra README][].
 Then follow the instructions in the [ansible/monitor README][].
 
-[terraform-infra README]: /terraform-infra/README.md
-[ansible/monitor README]: /ansible/monitor/README.md
+[terraform-infra README]: https://github.com/adeck/terraform-infra/
+[ansible/monitor README]: /ansible/monitor/
 

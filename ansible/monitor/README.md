@@ -15,16 +15,20 @@ The playbook here (`monitor.yaml`) sets up the Elastic stack (Elasticsearch, Kib
 
 ### Prerequisites
 
-For the ansible playbook to run correctly, you will need a Debian 11 host.
-You will need to be able to SSH to that host by running the command `ssh admin@monitor`.
-You can get around some of this by changing your SSH config and / or altering the `inventory.yaml` file in this directory.
+The easiest way to satisfy all prereqs implicitly is to follow the instructions in the [terraform-infra README][].
+If you've followed the steps in that guide, you can skip the rest of this section on prereqs.
 
-The easiest way to satisfy those requirements implicitly is to follow the instructions in the [terraform-infra README][].
-However, aside from the `inventory.yaml`, no other part of the code makes any assumptions except that:
+This ansible playbook assumes a few things about the machine it is configuring, namely:
 
 1. The host has internet access.
 2. The host is running Debian 11.
 3. The user you SSH to either is root, or has the appropriate permissions to run `sudo -i` (become root) without prompting for a password.
+
+Aside from the above there are no assumptions in the playbook itself.
+
+The playbook identifies the host it's targeting as `monitor`.
+How ansible connects to this host is configured by your SSH config, and also by the `inventory.yaml` in this directory.
+Based on this `inventory.yaml`, ansible will attempt to connect to your server using the command `ssh admin@monitor`.
 
 ### Provisioning the ELK server
 

@@ -2,7 +2,7 @@
 # ansible/monitor
 
 > :warning: The code here is not yet production-ready.
-> It does provision the Elastic stack, but the monitoring host currently only monitors itself. And it does functionally work, but I haven't locked down the security config.
+> The monitoring host currently only monitors itself, and I haven't locked down the security config.
 > I am not (yet) using this code in a production context.
 > You should not either.
 > You have been warned.

@@ -26,13 +26,13 @@ However, aside from the `inventory.yaml`, no other part of the code makes any as
 2. The host is running Debian 11.
 3. The user you SSH to either is root, or has the appropriate permissions to run `sudo -i` (become root) without prompting for a password.
 
-### How-To
+### Provisioning the ELK server
 
-First [create a python virtualenv][] and install [`ansible`][] into that virtualenv by entering this directory and running:
+After cloning the repo to your local machine and `cd`ing to this directory, [create a python virtualenv][]. Once you've created + activated the virtualenv, install [`ansible`][] by running:
 
     python3 -m pip install -r requirements.txt
 
-Then run the following:
+Then run the following to create the config file you will need for setup:
 
     mkdir -p nogit/keys/
     export CUR_ENV=devel
@@ -44,7 +44,8 @@ Then run the following:
     # you will need this password soon
     ansible-vault create --vault-id "${CUR_ENV}@prompt" "${VAULT_PATH}"
 
-On that last step, put the following into the file you're creating then save and close the editor:
+That last step will drop you into an editor.
+Enter the following YAML then save and close the editor:
 
     elasticsearch:
         users:
@@ -54,7 +55,7 @@ On that last step, put the following into the file you're creating then save and
             # You will need to enter this password into your browser later.
             elastic: I am a bad password.
 
-Nearly there! All that's left now is to run the playbook by running:
+Nearly there! All that's left now is to run the playbook with this command:
 
     # you will need to unlock the vault using the password you entered on the commandline when you created the vault
     ansible-playbook -i inventory.yaml --vault-id $CUR_ENV@prompt monitor.yaml
@@ -68,7 +69,7 @@ Run:
 
 Now navigate to http://localhost:7000 (you may need to change browser settings to allow this).
 Log in using the username `elastic` and the password you put in the vault YAML file above.
-A good dashboard to look at would be the `[Metricbeat System] Host overview ECS` dashboard.
+A good dashboard to look at would be the `[Metricbeat System] Host overview ECS` dashboard, so search for that by name in the search bar at the top of the page.
 It may take a couple of minutes for the dashboard to be properly populated with data.
 
 [terraform-infra README]: https://github.com/adeck/terraform-infra/

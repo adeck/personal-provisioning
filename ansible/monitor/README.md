@@ -33,7 +33,7 @@ If that will not work for you, see the [docs on inventory files][] and [docs on 
 
 ### Provisioning the ELK server
 
-After cloning the repo to your local machine and `cd`ing to this directory, [create a python virtualenv][]. Once you've created + activated the virtualenv, install [`ansible`][] by running:
+After cloning the repo to your local machine and `cd`ing to the same directory as this README, [create a python virtualenv][]. Once you've created + activated the virtualenv, install [`ansible`][] by running:
 
     python3 -m pip install -r requirements.txt
 

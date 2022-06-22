@@ -77,7 +77,7 @@ Log in using the username `elastic` and the password you put in the vault YAML f
 A good dashboard to look at would be the `[Metricbeat System] Host overview ECS` dashboard, so search for that by name in the search bar at the top of the page.
 It may take a couple of minutes for the dashboard to be properly populated with data.
 
-[ansible]: https://www.ansible.com/
+[ansible]: https://docs.ansible.com/ansible/latest/getting_started/index.html
 [Elastic stack]: https://www.elastic.co/
 [terraform-infra README]: https://github.com/adeck/terraform-infra/
 [docs on inventory files]: https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html

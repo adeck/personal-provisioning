@@ -39,7 +39,7 @@ After cloning the repo to your local machine and `cd`ing to the same directory a
 
 Then run the following to create the config file you will need for setup:
 
-    mkdir -p nogit/keys/
+    mkdir -p nogit/vaults/
     export CUR_ENV=devel
     export VAULT_PATH="nogit/vaults/${CUR_ENV}-vault.yaml"
     # the following command will create a YAML file with encrypted contents

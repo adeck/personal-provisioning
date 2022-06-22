@@ -37,7 +37,21 @@ After cloning the repo to your local machine and `cd`ing to the same directory a
 
     python3 -m pip install -r requirements.txt
 
-Then run the following to create the config file you will need for setup:
+Before trying to actually configure the host, let's validate that you can properly access the host with your SSH + inventory settings:
+
+    ansible -i inventory.yaml -m ping monitor
+
+Output should look similar to:
+
+    monitor | SUCCESS => {
+        "ansible_facts": {
+            "discovered_interpreter_python": "/usr/bin/python3"
+        },
+        "changed": false,
+        "ping": "pong"
+    }
+
+Then run the following to create + encrypt the config file you will need for setup:
 
     mkdir -p nogit/vaults/
     export CUR_ENV=devel

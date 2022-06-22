@@ -2,14 +2,14 @@
 # ansible/monitor
 
 > :warning: The code here is not yet production-ready.
-> The monitoring host currently only monitors itself, and I haven't locked down the security config.
-> I am not (yet) using this code in a production context.
+> The monitoring host only monitors itself and the security config is incomplete.
+> I am not using this code in a production context.
 > You should not either.
 > You have been warned.
 
 ## What is this code?
 
-The playbook here (`monitor.yaml`) sets up the Elastic stack (Elasticsearch, Kibana, and Metricbeat) v. >= 8.2 on a Debian 11 host.
+The [ansible][] playbook here (`monitor.yaml`) sets up the [Elastic stack][] (Elasticsearch, Kibana, and Metricbeat) v. >= 8.2 on a Debian 11 host.
 
 ## How do I run it?
 
@@ -29,6 +29,7 @@ Aside from the above there are no assumptions in the playbook itself.
 The playbook identifies the host it's targeting as `monitor`.
 How ansible connects to this host is configured by your SSH config, and also by the `inventory.yaml` in this directory.
 Based on this `inventory.yaml`, ansible will attempt to connect to your server using the command `ssh admin@monitor`.
+If that will not work for you, see the [docs on inventory files][] and [docs on SSH config][].
 
 ### Provisioning the ELK server
 
@@ -76,7 +77,11 @@ Log in using the username `elastic` and the password you put in the vault YAML f
 A good dashboard to look at would be the `[Metricbeat System] Host overview ECS` dashboard, so search for that by name in the search bar at the top of the page.
 It may take a couple of minutes for the dashboard to be properly populated with data.
 
+[ansible]: https://www.ansible.com/
+[Elastic stack]: https://www.elastic.co/
 [terraform-infra README]: https://github.com/adeck/terraform-infra/
+[docs on inventory files]: https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+[docs on SSH config]: https://linux.die.net/man/5/ssh_config
 [create a python virtualenv]: https://docs.python.org/3/tutorial/venv.html
 [`ansible`]: https://www.ansible.com/
 

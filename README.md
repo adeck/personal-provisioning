@@ -1,16 +1,23 @@
 # personal-provisioning
 
-A repo for provisioning my cloud infrastructure.
+A repo for provisioning my infrastructure.
 
-Short version:
-- terraform sets up everything but what's actually on the boxen (VPC, SGs, subnets, EIPs, forwarding tables, etc.)
-- ansible sets up salt infrastructure (I'm kind of... over ansible for the foreseeable future outside the context of bootstrapping salt. :P )
-- salt configures the boxen (files, installed packages, running services, etc.)
+Right now this repo is in a state of flux.
+In 2017 I was using this repo to set up a salt master / minion + icinga monitoring behind an SSH bastion, and then this repo died.
+In 2022 I resurrected this repo, updating terraform layouts to support the most recent version of terraform, and adding code to support deploying an ELK stack behind an SSH bastion via ansible.
 
-Haven't done much with packer yet.
-Don't really see a huge need at this point.
-With the salt highstate apply the limiting factor of speed in box setup is just the time it takes to set up the most complicated environment, and none of the environments I'm describing are complicated yet.
+## What's in here?
 
-So far I've got two boxen, an SSH gateway and a salt master. DNS within the subnet diverges from DNS outside the subnet.
-The terraform isn't actually all that complicated. Just messy. Needs a bit of cleaning. But I'm putting that off to work more on the salt, b/c the terraform is good enough for now.
+- `terraform-infra/` -- terraform layouts. Terraform sets up everything but what's actually on the boxen (VPC, SGs, subnets, EIPs, forwarding tables, etc.)
+- `ansible/` -- ansible playbooks. In `ansible/monitor/` I use ansible to set up an ELK stack v. 8.2. In `ansible/salt-icinga` I only use ansible to install salt components on all the hosts, and then delegate further setup to salt.
+- `salt-configs/` -- Salt formulae, states, and (non-sensitive) pillar data. Currently only used for the `ansible/salt-icinga` stuff.
+
+## How do I provision the ELK stack?
+
+
+First, provision the hardware by following the instructions in the [terraform-infra README][].
+Then follow the instructions in the [ansible/monitor README][].
+
+[terraform-infra README]: https://github.com/adeck/terraform-infra/
+[ansible/monitor README]: /ansible/monitor/
 

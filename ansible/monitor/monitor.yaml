@@ -1,0 +1,129 @@
+
+# setting up an ELK server as per:
+# https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-elastic-stack.html
+- hosts: monitor
+  collections: [ansible.builtin]
+  become: yes
+  gather_facts: no
+  vars:
+    cur_env: "{{ lookup('env', 'CUR_ENV') | default('devel', True) }}"
+    metricbeat_ca_path: /etc/metricbeat/elasticsearch_http_ca.crt
+  tasks:
+    - debug:
+        var: cur_env
+    - name: Include monitor vars
+      include_vars:
+        file: "nogit/vaults/{{ cur_env }}-vault.yaml"
+        name: monitor
+      no_log: true
+    #### Repo + prereqs
+    - name: Install repo + stack dependencies
+      block:
+        - name: Ensure openjdk is installed
+          apt:
+            name: openjdk-17-jdk
+            # equivalent to running `apt-get update` prior to package install
+            # as of 2022-6-4, without this the playbook fails
+            update_cache: yes
+        - name: Install GPG so `apt_key` works.
+          apt:
+            name: gpg
+        # TODO: `apt_key` module is deprecated. Debian has decided to "simplify" things by deprecating the `apt-key` command without providing a convenient command that fills the same niche.
+        - name: Install the elastic.co repo key.
+          apt_key:
+            url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        - name: Install the elastic.co repo.
+          apt_repository:
+            repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+    #### Elasticsearch
+    - name: Elasticsearch install + config
+      block:
+        - name: Install elasticsearch.
+          apt:
+            name: elasticsearch
+        - name: Enable and start elasticsearch.
+          systemd:
+            name: elasticsearch
+            state: started
+            enabled: yes
+          # See: https://github.com/elastic/elasticsearch/blob/1088ef6ded05ba91ac9c7ead62f851a58d8c5dfc/x-pack/plugin/security/src/main/java/org/elasticsearch/xpack/security/authc/esnative/tool/ResetPasswordTool.java#L68-L79
+          # -b / --batch -- indicates this is being run from the commandline, not interactively
+          # -i // --interactive -- indicates we are manually setting the password, not having the tool autogenerate + set a password
+        - name: Set password for "elastic" user
+          command: ./bin/elasticsearch-reset-password -u elastic -b -i
+          args:
+            chdir: /usr/share/elasticsearch
+            stdin: "{{ password }}\n{{ password }}"
+          vars:
+            password: "{{ monitor.elasticsearch.users.elastic }}"
+          register: result
+          failed_when: not (result.rc == 0 and result.stdout == "Password for the [elastic] user successfully reset.")
+        - name: Validate password is correct
+          uri:
+            url: "https://localhost:9200"
+            ca_path: /etc/elasticsearch/certs/http_ca.crt
+            user: elastic
+            password: "{{ monitor.elasticsearch.users.elastic }}"
+            follow_redirects: none
+          timeout: 5
+          # this doesn't ever actually change anything
+          changed_when: "false"
+    #### Install kibana
+    - name: Kibana install + config
+      block:
+        - name: Install kibana.
+          apt:
+            name: kibana
+        - name: Generate elasticsearch token for kibana
+          command: ./bin/elasticsearch-create-enrollment-token --scope kibana
+          args:
+            chdir: /usr/share/elasticsearch
+          register: es_token
+        - name: Register token with kibana
+          command: ./bin/kibana-setup --enrollment-token {{ es_token.stdout }}
+          args:
+            chdir: /usr/share/kibana
+        - name: Enable and start kibana.
+          systemd:
+            name: kibana
+            state: started
+            enabled: yes
+    - name: Metricbeat install + config
+      block:
+        - name: Install metricbeat.
+          apt:
+            name: metricbeat
+        - name: Copy the Elasticsearch HTTP CA certs
+          copy:
+            remote_src: yes
+            src: /etc/elasticsearch/certs/http_ca.crt
+            dest: '{{ metricbeat_ca_path }}'
+            mode: 0444
+            owner: root
+            group: root
+        - name: Template the metricbeat config file
+          vars:
+            config_path: /etc/metricbeat/metricbeat.yml
+          template:
+            src: "templates/{{ config_path }}"
+            dest: "{{ config_path }}"
+            owner: root
+            group: root
+            mode: 0600
+        # NOTE -- as of 2022-6-5, system module is enabled by default
+        - name: Enable metricbeat modules
+          command: "metricbeat modules enable {{ item }}"
+          register: result
+          changed_when: "result.stdout == ('Enabled ' + item)"
+          loop: [system]
+        - name: Wait for kibana to finish startup
+          pause:
+            seconds: 20
+        - name: Loads the kibana dashboards
+          command: metricbeat setup
+        - name: Enable and start metricbeat
+          systemd:
+            name: metricbeat
+            state: started
+            enabled: yes
+

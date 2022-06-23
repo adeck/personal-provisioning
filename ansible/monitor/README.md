@@ -93,6 +93,7 @@ Now navigate to http://localhost:7000 (you may need to change browser settings t
 Log in using the username `elastic` and the password you put in the vault YAML file above.
 A good dashboard to look at would be the `[Metricbeat System] Host overview ECS` dashboard, so search for that by name in the search bar at the top of the page.
 It may take a couple of minutes for the dashboard to be properly populated with data.
+Anecdotally, it takes about two to five minutes for data to start showing up, and you will want to refresh the range.
 
 [ansible]: https://docs.ansible.com/ansible/latest/getting_started/index.html
 [Elastic stack]: https://www.elastic.co/

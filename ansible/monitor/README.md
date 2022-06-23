@@ -27,8 +27,8 @@ This ansible playbook assumes a few things about the machine it is configuring, 
 Aside from the above there are no assumptions in the playbook itself.
 
 The playbook identifies the host it's targeting as `monitor`.
-How ansible connects to this host is configured by your SSH config, and also by the `inventory.yaml` in this directory.
-Based on this `inventory.yaml`, ansible will attempt to connect to your server using the command `ssh admin@monitor`.
+How ansible connects to this host is configured by your SSH config, and also by the inventory file (`inventory.yaml`) in this directory.
+Assuming you make no changes to the inventory file, ansible will attempt to connect to your server with the command `ssh admin@monitor`.
 If that will not work for you, see the [docs on inventory files][] and [docs on SSH config][].
 
 ### Provisioning the ELK server

@@ -33,7 +33,7 @@ If that will not work for you, see the [docs on inventory files][] and [docs on 
 
 ### Provisioning the ELK server
 
-After cloning the repo to your local machine and `cd`ing to the same directory as this README, [create a python virtualenv][]. Once you've created + activated the virtualenv, install [`ansible`][] by running:
+After cloning the repo to your local machine and `cd`ing to the same directory as this README, [create a python virtualenv][]. Once you've created + activated the virtualenv, install `ansible` by running:
 
     python3 -m pip install -r requirements.txt
 
@@ -97,5 +97,4 @@ It may take a couple of minutes for the dashboard to be properly populated with 
 [docs on inventory files]: https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
 [docs on SSH config]: https://linux.die.net/man/5/ssh_config
 [create a python virtualenv]: https://docs.python.org/3/tutorial/venv.html
-[`ansible`]: https://www.ansible.com/
 

@@ -7,7 +7,10 @@
   gather_facts: no
   vars:
     cur_env: "{{ lookup('env', 'CUR_ENV') | default('devel', True) }}"
+    elastic_repo_url: https://artifacts.elastic.co/packages/8.x/apt
     metricbeat_ca_path: /etc/metricbeat/elasticsearch_http_ca.crt
+    key_staging_path: /root/elasticsearch-armored.gpg
+    key_final_path: /usr/share/keyrings/elasticsearch-archive-keyring.gpg
   tasks:
     - debug:
         var: cur_env
@@ -28,13 +31,27 @@
         - name: Install GPG so `apt_key` works.
           apt:
             name: gpg
-        # TODO: `apt_key` module is deprecated. Debian has decided to "simplify" things by deprecating the `apt-key` command without providing a convenient command that fills the same niche.
-        - name: Install the elastic.co repo key.
-          apt_key:
+        - name: Download elastic.co repo key
+          get_url:
             url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
-        - name: Install the elastic.co repo.
-          apt_repository:
-            repo: deb https://artifacts.elastic.co/packages/8.x/apt stable main
+            dest: "{{ key_staging_path }}"
+            checksum: sha256:10e406ba504706f44fbfa57a8daba5cec2678b31c1722e262ebecb5102d07659
+        - name: Dearmor the GPG key
+          shell: "gpg --dearmor -o {{ key_final_path }} < {{ key_staging_path }}"
+          args:
+            creates: "{{ key_final_path }}"
+        - name: Add the elastic.co repo sources.list.d/ file
+          vars:
+            config_path: /etc/apt/sources.list.d/elasticsearch.list
+          template:
+            src: "templates/{{ config_path }}"
+            dest: "{{ config_path }}"
+            owner: root
+            group: root
+            mode: 0644
+        - name: Load cache for elastic repo
+          apt:
+            update_cache: yes
     #### Elasticsearch
     - name: Elasticsearch install + config
       block:

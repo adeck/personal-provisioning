@@ -1,0 +1,1 @@
+deb [signed-by={{ key_final_path }}] {{ elastic_repo_url }} stable main

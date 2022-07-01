@@ -10,6 +10,9 @@
 ## What is this code?
 
 The [ansible][] playbook here (`monitor.yaml`) sets up the [Elastic stack][] (Elasticsearch, Kibana, and Metricbeat) v. >= 8.2 on a Debian 11 host.
+I expect this playbook will only be run a few times against any individual host- the idea here is to bake an image, not use ansible for continued maintenance.
+Running the playbook multiple times shouldn't break anything, but it does generate a registration token for kibana to connect to elasticsearch each time, and load kibana dashboards for metricbeat.
+Those tokens each expire after 30 minutes though, so I'm not sure whether multiple registrations would be an issue.
 
 ## How do I run it?
 
